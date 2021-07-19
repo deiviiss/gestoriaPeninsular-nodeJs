@@ -199,7 +199,7 @@ helpers.costoLocal = (cantidad) => {
     cobroCliente = cobro + aseguramiento
     libreCliente = cantidad - cobroCliente
   }
-  else if (cantidad > 15000) {
+  else if (cantidad > 15001) {
     cobro = cantidad * .25
     aseguramiento = 1700
     cobroCliente = cobro + aseguramiento
@@ -254,7 +254,7 @@ helpers.costoforaneo1 = (cantidad) => {
     cobroCliente = cobro + aseguramiento
     libreCliente = cantidad - cobroCliente
   }
-  else if (cantidad > 14999) {
+  else if (cantidad > 15001) {
     cobro = cantidad * .25
     aseguramiento = 1700
     cobroCliente = cobro + aseguramiento
@@ -391,7 +391,7 @@ helpers.liquidacionSocio = (monto, abono) => {
     liquidar = sinAbono + abono
   }
 
-  else if (monto > 14999) {
+  else if (monto > 15001) {
     porcentaje = .25
     comision = monto * porcentaje
     aseguramiento = 1700
@@ -448,7 +448,7 @@ helpers.liquidacionLocal = (monto) => {
     liquidar = (comision + aseguramiento) - asesor
   }
 
-  else if (monto > 14999) {
+  else if (monto > 15001) {
     porcentaje = .25
     comision = monto * porcentaje
     aseguramiento = 1700
@@ -527,7 +527,7 @@ helpers.liquidacionEspecial = (monto, abono) => {
     liquidar = sinAbono + abono
   }
 
-  else if (monto > 14999) {
+  else if (monto > 15001) {
     porcentaje = .20
     comision = monto * porcentaje
     aseguramiento = 1700
@@ -586,7 +586,7 @@ helpers.liquidacionSucursalLocal = (monto) => {
     liquidar = comision + aseguramiento
   }
 
-  else if (monto > 14999) {
+  else if (monto > 15001) {
     porcentaje = .25
     comision = monto * porcentaje
     aseguramiento = 1700
@@ -636,7 +636,7 @@ helpers.liquidacionSucursalEspecial = (monto) => {
     liquidar = comision + aseguramiento
   }
 
-  else if (monto > 14999) {
+  else if (monto > 15001) {
     porcentaje = .20
     comision = monto * porcentaje
     aseguramiento = 1700
@@ -698,7 +698,7 @@ helpers.liquidacionAseguramiento = (monto) => {
     aseguramiento = 2000
   }
 
-  else if (monto > 14999) {
+  else if (monto > 15001) {
     aseguramiento = 1700
   }
   else if (monto > 0) {
