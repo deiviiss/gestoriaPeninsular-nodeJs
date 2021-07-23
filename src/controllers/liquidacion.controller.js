@@ -140,7 +140,7 @@ controller.getLiquidar = async (req, res) => {
     customer = await db.query(sqlCustomer, id)
 
     //liquidacion como socio cobrando el 25% y sucursal (liquidacion integra)
-    if (user.zona !== 'Campeche3' && user.zona !== 'Tizimin' && user.zona !== 'Escarcega' && user.zona !== 'Champoton' && user.zona !== 'Palenque' && user.zona !== 'Campeche') {
+    if (user.zona !== 'Campeche3' && user.zona !== 'Tizimin' && user.zona !== 'Escarcega' && user.zona !== 'Champotón' && user.zona !== 'Palenque' && user.zona !== 'Campeche') {
       tipoLiquidacion = [
         {
           liquidacion: 'Socio'
@@ -155,7 +155,7 @@ controller.getLiquidar = async (req, res) => {
 
     }
     //liquidacion fornea cobra 30%
-    else if (user.zona == 'Escarcega' || user.zona == 'Champoton' || user.zona == 'Palenque') {
+    else if (user.zona == 'Escarcega' || user.zona == 'Champotón' || user.zona == 'Palenque') {
       tipoLiquidacion = [
         {
           liquidacion: 'Foránea'

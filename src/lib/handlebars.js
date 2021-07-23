@@ -180,7 +180,7 @@ helpers.formatterLiquidacionTotal = (liquidacionTotal) => {
 }
 
 //*funciones costos
-//Campeche, Campeche2 Campoeche3 
+//Campeche, Campeche2 Campeche3 
 helpers.costoLocal = (cantidad) => {
   let cobro
   let aseguramiento
@@ -199,7 +199,7 @@ helpers.costoLocal = (cantidad) => {
     cobroCliente = cobro + aseguramiento
     libreCliente = cantidad - cobroCliente
   }
-  else if (cantidad > 15001) {
+  else if (cantidad > 15000) {
     cobro = cantidad * .25
     aseguramiento = 1700
     cobroCliente = cobro + aseguramiento
@@ -254,7 +254,7 @@ helpers.costoforaneo1 = (cantidad) => {
     cobroCliente = cobro + aseguramiento
     libreCliente = cantidad - cobroCliente
   }
-  else if (cantidad > 15001) {
+  else if (cantidad > 15000) {
     cobro = cantidad * .25
     aseguramiento = 1700
     cobroCliente = cobro + aseguramiento
@@ -391,7 +391,7 @@ helpers.liquidacionSocio = (monto, abono) => {
     liquidar = sinAbono + abono
   }
 
-  else if (monto > 15001) {
+  else if (monto > 15000) {
     porcentaje = .25
     comision = monto * porcentaje
     aseguramiento = 1700
@@ -448,7 +448,7 @@ helpers.liquidacionLocal = (monto) => {
     liquidar = (comision + aseguramiento) - asesor
   }
 
-  else if (monto > 15001) {
+  else if (monto > 15000) {
     porcentaje = .25
     comision = monto * porcentaje
     aseguramiento = 1700
@@ -527,7 +527,7 @@ helpers.liquidacionEspecial = (monto, abono) => {
     liquidar = sinAbono + abono
   }
 
-  else if (monto > 15001) {
+  else if (monto > 15000) {
     porcentaje = .20
     comision = monto * porcentaje
     aseguramiento = 1700
@@ -586,7 +586,7 @@ helpers.liquidacionSucursalLocal = (monto) => {
     liquidar = comision + aseguramiento
   }
 
-  else if (monto > 15001) {
+  else if (monto > 15000) {
     porcentaje = .25
     comision = monto * porcentaje
     aseguramiento = 1700
@@ -636,7 +636,7 @@ helpers.liquidacionSucursalEspecial = (monto) => {
     liquidar = comision + aseguramiento
   }
 
-  else if (monto > 15001) {
+  else if (monto > 15000) {
     porcentaje = .20
     comision = monto * porcentaje
     aseguramiento = 1700
