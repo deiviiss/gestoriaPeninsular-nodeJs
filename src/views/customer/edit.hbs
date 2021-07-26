@@ -138,6 +138,15 @@
 
                 {{/if_equal}}
 
+                {{#if_equal user.permiso "Temporal"}}
+
+                  <a
+                    href="/liquidaciones/liquidar/{{customer.id}}"
+                    class="btn btn-secondary btn-edit"
+                  ><i class="fas fa-dollar-sign mr-1"></i>Liquidar</a>
+
+                {{/if_equal}}
+
                 {{! Pendiente y administrador }}
                 {{#if_equal user.permiso "Administrador"}}
                   <div class="text-center">

@@ -254,40 +254,52 @@ controller.postLiquidarZona = async (req, res) => {
 
 //cierra liquidación por zona
 controller.getClosed = async (req, res) => {
-  const zona = req.query.zona;
-  const fechaActual = new Date();
+  const user = req.user;
 
-  const sqlLiquidaciones = "SELECT l.id_cliente FROM liquidaciones AS l JOIN tramites AS t ON t.id = l.id_cliente WHERE l.status = 'open' AND t.zona = ?"
+  if (user.permiso !== 'Encargado') {
+    let zona = req.query.zona;
+    const fechaActual = new Date();
 
-  const liquidaciones = await db.query(sqlLiquidaciones, zona)
+    const sqlLiquidaciones = "SELECT l.id_cliente FROM liquidaciones AS l JOIN tramites AS t ON t.id = l.id_cliente WHERE l.status = 'open' AND t.zona = ?"
 
-  if (liquidaciones.length !== 0) {
-    //número para generar el folio aleatorio
-    numeroAleatorio = liquidaciones[0].id_cliente
-
-    // Creo folio
-    let folio = 'F-' + (fechaActual.getMonth() + 1) + helpers.numAleatorio(numeroAleatorio, 1);
-
-    //objeto con el folio para cerrar liquidación
-    const closeLiquidacion = {
-      status: 'closed',
-      fecha_liquidacion: fechaActual,
-      folio
+    if (zona.length === 0) {
+      zona = user.zona
     }
 
-    //cierro liquidaciones
-    for (let i = 0; i < liquidaciones.length; i++) {
-      let idcliente = liquidaciones[i].id_cliente
-      const sqlCloseLiquidacion = 'UPDATE liquidaciones SET ? WHERE id_cliente = ?;';
+    const liquidaciones = await db.query(sqlLiquidaciones, zona)
 
-      await db.query(sqlCloseLiquidacion, [closeLiquidacion, idcliente])
+    if (liquidaciones.length !== 0) {
+      //número para generar el folio aleatorio
+      numeroAleatorio = liquidaciones[0].id_cliente
+
+      // Creo folio
+      let folio = 'F-' + (fechaActual.getMonth() + 1) + helpers.numAleatorio(numeroAleatorio, 1);
+
+      //objeto con el folio para cerrar liquidación
+      const closeLiquidacion = {
+        status: 'closed',
+        fecha_liquidacion: fechaActual,
+        folio
+      }
+
+      //cierro liquidaciones
+      for (let i = 0; i < liquidaciones.length; i++) {
+        let idcliente = liquidaciones[i].id_cliente
+        const sqlCloseLiquidacion = 'UPDATE liquidaciones SET ? WHERE id_cliente = ?;';
+
+        await db.query(sqlCloseLiquidacion, [closeLiquidacion, idcliente])
+      }
+
+      req.flash('warning', `Folio de cierre ${folio}`)
+      res.redirect('/liquidaciones')
     }
-
-    req.flash('warning', `Folio de cierre ${folio}`)
-    res.redirect('/liquidaciones')
+    else {
+      req.flash('fail', 'Sin liquidaciones abiertas')
+      res.redirect('/liquidaciones')
+    }
   }
   else {
-    req.flash('fail', 'Sin liquidaciones abiertas')
+    req.flash('fail', 'Sin permiso suficiente')
     res.redirect('/liquidaciones')
   }
 }

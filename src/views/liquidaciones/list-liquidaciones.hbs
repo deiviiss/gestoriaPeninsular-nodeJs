@@ -74,6 +74,17 @@
 
         {{/if_equal}}
 
+        {{#if_equal user.permiso "Temporal"}}
+
+          <div class="buttons btn-list">
+            <a
+              href="/liquidaciones/close-liquidacion/?zona={{zona}}"
+              class="btn btn-danger btn-space"
+            >Liquidar</a>
+          </div>
+
+        {{/if_equal}}
+
       </div>
       {{#each liquidaciones}}
 
