@@ -86,6 +86,10 @@ input[type="number"] {
   padding-top: 9em;
 }
 
+.content .print {
+  display: none;
+}
+
 /*Estilos main*/
 .main {
   display: -webkit-box;
@@ -1257,16 +1261,19 @@ input[type="number"] {
 }
 
 @media print {
-  .footer {
-    display: none;
-  }
   body {
     background: none;
+  }
+  .content .print {
+    display: inline-block;
   }
   .list-customers {
     -webkit-writing-mode: horizontal-tb;
         -ms-writing-mode: lr-tb;
             writing-mode: horizontal-tb;
+  }
+  .footer {
+    display: none;
   }
 }
 /*# sourceMappingURL=styles.css.map */

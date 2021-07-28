@@ -1,0 +1,57 @@
+{{! Formulario agregar observaciones }}
+
+<div class="container-box">
+
+  <div class="container p-2">
+    <div class="col-md-6 mt-2 mx-auto">
+
+      <form
+        action="/liquidaciones/close-liquidacion/?zona={{zona}}"
+        method="post"
+        class="form__edit"
+        name="formulario_cliente"
+      >
+
+        <div class="card border-info text-dark bg-light">
+
+          <div class="card_title">
+            <h5 class="card-header text-muted">{{zona}}</h5>
+          </div>
+
+          <div class="card-body">
+
+            <h6 class="card-title mb-4 text-center">Observaciones:</h6>
+
+            <div class="mb-4">
+              <div class="form__input">
+                <div class="form__input-item">
+                  <input
+                    class="form-control text-center"
+                    type="text"
+                    name="observaciones"
+                    autocomplete="off"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="buttons">
+
+              <input
+                class="btn btn-info"
+                type="submit"
+                name="btn-submit"
+                id="form__btn-submit"
+                value="Liquidar"
+              />
+
+            </div>
+
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>

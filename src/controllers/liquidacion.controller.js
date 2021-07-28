@@ -69,7 +69,7 @@ controller.postLiquidaciones = async (req, res) => {
   const { folio } = req.body;
   const user = req.user;
 
-  const sqlLiquidaciones = "SELECT l.id_cliente, t.cliente, t.monto, l.porcentaje, l.comision, l.aseguramiento, l.asesor, l.sucursal, l.abono, l.liquidar, t.zona, l.fecha_liquidacion, l.folio, t.fecha_tramite FROM liquidaciones AS l JOIN tramites AS t ON t.id = l.id_cliente WHERE l.folio = ?"
+  const sqlLiquidaciones = "SELECT l.id_cliente, t.cliente, t.monto, l.porcentaje, l.comision, l.aseguramiento, l.asesor, l.sucursal, l.abono, l.liquidar, t.zona, l.fecha_liquidacion, l.folio, t.fecha_tramite, l.observaciones FROM liquidaciones AS l JOIN tramites AS t ON t.id = l.id_cliente WHERE l.folio = ?"
 
   if (folio !== '') {
 
@@ -95,25 +95,27 @@ controller.postLiquidaciones = async (req, res) => {
     if (liquidaciones.length !== 0 && liquidaciones[0].liquidar !== null) {
       zona = liquidaciones[0].zona;
 
+      //formato a fecha de liquidación
       liquidaciones[0].fecha_liquidacion = helpers.formatterFecha(liquidaciones[0].fecha_liquidacion);
 
-      fechaLiquidacion = liquidaciones[0].fecha_liquidacion;
 
       //?suma los totales de las liquidaciones
       liquidacionTotal = liquidaciones.reduce((sum, value) => (typeof value.liquidar == "number" ? sum + value.liquidar : sum), 0);
       liquidacionTotal = liquidacionTotal.toFixed(2)
 
+      //formato a objetos a enviar
+      fechaLiquidacion = liquidaciones[0].fecha_liquidacion;
       liquidaciones = helpers.formatterLiquidaciones(liquidaciones)
       liquidacionTotal = helpers.formatterLiquidacionTotal(liquidacionTotal)
       liquidacionFolio = liquidaciones[0].folio
+      observaciones = liquidaciones[0].observaciones
 
-      res.render('liquidaciones/liquidacion.hbs', { liquidaciones, liquidacionTotal, zona, fechaLiquidacion, liquidacionFolio })
+      res.render('liquidaciones/liquidacion.hbs', { liquidaciones, liquidacionTotal, zona, fechaLiquidacion, liquidacionFolio, observaciones })
     }
     else {
       req.flash('fail', 'Folio incorrecto');
       res.redirect('/liquidaciones')
     }
-
   }
   else {
     req.flash('fail', 'Escribe el folio de la liquidación');
@@ -252,54 +254,114 @@ controller.postLiquidarZona = async (req, res) => {
   res.render('liquidaciones/liquidacion.hbs', { liquidaciones, liquidacionTotal, zona })
 }
 
-//cierra liquidación por zona
+//agrega observaciones para cerrar liquidación
 controller.getClosed = async (req, res) => {
   const user = req.user;
+  let zona = req.query.zona;
+  const sqlLiquidaciones = "SELECT l.id_cliente FROM liquidaciones AS l JOIN tramites AS t ON t.id = l.id_cliente WHERE l.status = 'open' AND t.zona = ?"
 
-  if (user.permiso !== 'Encargado') {
-    let zona = req.query.zona;
-    const fechaActual = new Date();
+  //En caso que el permiso sea temporal
+  if (zona.length === 0) {
+    zona = user.zona
+  }
 
-    const sqlLiquidaciones = "SELECT l.id_cliente FROM liquidaciones AS l JOIN tramites AS t ON t.id = l.id_cliente WHERE l.status = 'open' AND t.zona = ?"
+  const liquidaciones = await db.query(sqlLiquidaciones, zona)
 
-    if (zona.length === 0) {
-      zona = user.zona
-    }
-
-    const liquidaciones = await db.query(sqlLiquidaciones, zona)
-
-    if (liquidaciones.length !== 0) {
-      //número para generar el folio aleatorio
-      numeroAleatorio = liquidaciones[0].id_cliente
-
-      // Creo folio
-      let folio = 'F-' + (fechaActual.getMonth() + 1) + helpers.numAleatorio(numeroAleatorio, 1);
-
-      //objeto con el folio para cerrar liquidación
-      const closeLiquidacion = {
-        status: 'closed',
-        fecha_liquidacion: fechaActual,
-        folio
-      }
-
-      //cierro liquidaciones
-      for (let i = 0; i < liquidaciones.length; i++) {
-        let idcliente = liquidaciones[i].id_cliente
-        const sqlCloseLiquidacion = 'UPDATE liquidaciones SET ? WHERE id_cliente = ?;';
-
-        await db.query(sqlCloseLiquidacion, [closeLiquidacion, idcliente])
-      }
-
-      req.flash('warning', `Folio de cierre ${folio}`)
-      res.redirect('/liquidaciones')
+  if (liquidaciones.length != 0) {
+    if (user.permiso !== 'Encargado') {
+      res.render('liquidaciones/observacion-liquidacion.hbs', { zona })
     }
     else {
-      req.flash('fail', 'Sin liquidaciones abiertas')
+      req.flash('fail', 'Sin permiso suficiente')
       res.redirect('/liquidaciones')
     }
   }
   else {
-    req.flash('fail', 'Sin permiso suficiente')
+    req.flash('fail', 'Sin liquidaciones abiertas')
+    res.redirect('/liquidaciones')
+  }
+}
+
+controller.postClosed = async (req, res) => {
+  let zona = req.query.zona;
+  let { observaciones } = req.body;
+  const user = req.user;
+  const fechaActual = new Date();
+
+  let sqlLiquidaciones = "SELECT l.id_cliente FROM liquidaciones AS l JOIN tramites AS t ON t.id = l.id_cliente WHERE l.status = 'open' AND t.zona = ?"
+
+  //En caso que el permiso sea temporal
+  if (zona.length === 0) {
+    zona = user.zona
+  }
+
+  // Consulta liquidaciones abiertas
+  let liquidaciones = await db.query(sqlLiquidaciones, zona)
+
+  if (liquidaciones.length !== 0) {
+
+    sqlLiquidaciones = "SELECT l.id_cliente, t.cliente, t.monto, l.porcentaje, l.comision, l.aseguramiento, l.asesor, l.sucursal, l.abono, l.liquidar, t.zona, l.fecha_liquidacion, l.folio, t.fecha_tramite, l.observaciones FROM liquidaciones AS l JOIN tramites AS t ON t.id = l.id_cliente WHERE l.folio = ?"
+
+    //número para generar el folio aleatorio
+    numeroAleatorio = liquidaciones[0].id_cliente
+
+    // Creo folio
+    let folio = 'F-' + (fechaActual.getMonth() + 1) + helpers.numAleatorio(numeroAleatorio, 1);
+
+    //objeto con el folio para cerrar liquidación
+    const closeLiquidacion = {
+      status: 'closed',
+      fecha_liquidacion: fechaActual,
+      folio,
+      observaciones,
+      cierre: user.fullname
+    }
+
+    //cierro liquidaciones
+    for (let i = 0; i < liquidaciones.length; i++) {
+      let idcliente = liquidaciones[i].id_cliente
+      const sqlCloseLiquidacion = 'UPDATE liquidaciones SET ? WHERE id_cliente = ?;';
+
+      await db.query(sqlCloseLiquidacion, [closeLiquidacion, idcliente])
+    }
+
+    //consulto liquidación finalizada
+    liquidaciones = await db.query(sqlLiquidaciones, folio)
+
+    //objeto con el status y el motivo para actualizar trámite
+    const updateStatus = {
+      status: 'Finalizado',
+      fecha_status: fechaActual,
+      fecha_solucion: fechaActual
+    }
+
+    //cambio status tramites
+    for (let i = 0; i < liquidaciones.length; i++) {
+      let idcliente = liquidaciones[i].id_cliente
+
+      const sqlCloseLiquidacion = 'UPDATE tramites SET ? WHERE id = ?;';
+
+      await db.query(sqlCloseLiquidacion, [updateStatus, idcliente])
+    }
+
+    //formato a fecha de liquidación
+    liquidaciones[0].fecha_liquidacion = helpers.formatterFecha(liquidaciones[0].fecha_liquidacion);
+
+    //?suma los totales de las liquidaciones
+    liquidacionTotal = liquidaciones.reduce((sum, value) => (typeof value.liquidar == "number" ? sum + value.liquidar : sum), 0);
+    liquidacionTotal = liquidacionTotal.toFixed(2)
+
+    //formato a objetos a enviar
+    fechaLiquidacion = liquidaciones[0].fecha_liquidacion;
+    liquidaciones = helpers.formatterLiquidaciones(liquidaciones)
+    liquidacionTotal = helpers.formatterLiquidacionTotal(liquidacionTotal)
+    liquidacionFolio = liquidaciones[0].folio
+    observaciones = liquidaciones[0].observaciones
+
+    res.render('liquidaciones/liquidacion.hbs', { liquidaciones, liquidacionTotal, zona, fechaLiquidacion, liquidacionFolio, observaciones })
+  }
+  else {
+    req.flash('fail', 'Sin liquidaciones abiertas')
     res.redirect('/liquidaciones')
   }
 }

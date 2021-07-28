@@ -104,6 +104,10 @@ input[type="number"] {
 .content {
   // border: $test;
   padding-top: 9em;
+
+  .print {
+    display: none;
+  }
 }
 
 /*Estilos main*/
@@ -1174,14 +1178,16 @@ input[type="number"] {
 }
 
 @media print {
-  .footer {
-    display: none;
-  }
-
   body {
     background: none;
   }
+  .content .print {
+    display: inline-block;
+  }
   .list-customers {
     writing-mode: horizontal-tb;
+  }
+  .footer {
+    display: none;
   }
 }

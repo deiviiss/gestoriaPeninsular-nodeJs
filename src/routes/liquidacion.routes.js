@@ -23,7 +23,9 @@ router.post('/liquidaciones/liquidar/:id', isLoggedIn, controller.postLiquidar);
 //liquidación por zona
 router.post('/liquidaciones/liquidar-zona', isLoggedIn, controller.postLiquidarZona);
 
-//cierra liquidación por zona
+//solicita observaciones para cerrar
 router.get('/liquidaciones/close-liquidacion', isLoggedIn, controller.getClosed);
 
+//cierra liquidación por zona con observaciones
+router.post('/liquidaciones/close-liquidacion', isLoggedIn, controller.postClosed);
 module.exports = router;

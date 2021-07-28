@@ -147,27 +147,10 @@ controller.getStatus = async (req, res) => {
 
   else if (permiso !== 'Encargado') {
 
-    if (statusCustomer === 'Liquidar') {
-      //objeto que validad si se solicita el folio de cierre
-      folio = {
-        folio: "liquidar"
-      }
+    const sqlStatus = 'SELECT status FROM status WHERE status != "Pendiente" AND status != "Liquidar" AND status != "En espera" AND status != "Finalizado" ORDER BY statuS;'
 
-      const sqlStatus = 'SELECT status FROM status WHERE status = "Finalizado";'
-      status = await db.query(sqlStatus)
-      res.render('customer/status.hbs', { customer: customer[0], status, folio })
-    }
-    else {
-      //objeto que validad si se solicita el folio de cierre
-      folio = {
-        folio: "no-liquidar"
-      }
-
-      const sqlStatus = 'SELECT status FROM status WHERE status != "Pendiente" AND status != "Liquidar" AND status != "En espera" AND status != "Finalizado" ORDER BY statuS;'
-
-      status = await db.query(sqlStatus)
-      res.render('customer/status.hbs', { customer: customer[0], status, folio })
-    }
+    status = await db.query(sqlStatus)
+    res.render('customer/status.hbs', { customer: customer[0], status })
   }
 
   else {
