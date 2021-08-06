@@ -142,7 +142,7 @@ controller.getLiquidar = async (req, res) => {
     customer = await db.query(sqlCustomer, id)
 
     //liquidacion como socio cobrando el 25% y sucursal (liquidacion integra)
-    if (user.zona !== 'Campeche3' && user.zona !== 'Tizimin' && user.zona !== 'Escarcega' && user.zona !== 'Champotón' && user.zona !== 'Palenque' && user.zona !== 'Campeche') {
+    if (user.zona !== 'Campeche3' && user.zona !== 'Tizimín' && user.zona !== 'Escarcega' && user.zona !== 'Champotón' && user.zona !== 'Palenque' && user.zona !== 'Campeche') {
       tipoLiquidacion = [
         {
           liquidacion: 'Socio'
@@ -198,11 +198,14 @@ controller.getLiquidar = async (req, res) => {
 controller.postLiquidar = async (req, res) => {
   const { id } = req.params;
   let { tipo, abono } = req.body;
+  const fechaActual = new Date;
 
   //objeto con el status y el motivo para actualizar trámite
   const updateStatus = {
     status: 'Liquidar',
-    motivo: null
+    motivo: null,
+    fecha_solucion: fechaActual,
+    fecha_status: fechaActual
   }
 
   //actualizo el status
@@ -331,7 +334,6 @@ controller.postClosed = async (req, res) => {
     //objeto con el status y el motivo para actualizar trámite
     const updateStatus = {
       status: 'Finalizado',
-      fecha_status: fechaActual,
       fecha_solucion: fechaActual
     }
 
